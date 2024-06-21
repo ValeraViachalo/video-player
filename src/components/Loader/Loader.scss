@@ -1,0 +1,16 @@
+@import '/src/styles/global.scss';
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background-color: $c-white;
+  cursor: wait;
+
+  &__counter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
