@@ -1,68 +1,260 @@
-import FullWidthBg from "@/components/FullWidthBg/FullWidthBg";
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Home.scss";
-import { useIsPresent } from "framer-motion";
-import { Transition } from "@/components/Transition/Transition";
+import { motion, useTransform, useMotionValue, m } from "framer-motion";
+import ReactPlayer from "react-player";
+import classNames from "classnames";
 
 export default function Home() {
-  const isPresent = useIsPresent();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [played, setPlayed] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [seeking, setSeeking] = useState(false);
+  const [volume, setVolume] = useState(1);
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  const playerRef = useRef(null);
+
+  const playedMotionValue = useMotionValue(0);
+  const volumeMotionValue = useMotionValue(1);
+  const clipPathDuration = useTransform(
+    playedMotionValue,
+    [0, 1],
+    ["inset(0 100% 0 0)", "inset(0 0% 0 0)"]
+  );
+  const clipPathVolume = useTransform(
+    volumeMotionValue,
+    [0, 1],
+    ["inset(0 100% 0 0)", "inset(0 0% 0 0)"]
+  );
+
+  const handleDuration = (dur) => {
+    setDuration(dur);
+  };
+  
+  const handleProgress = (state) => {
+    if (!seeking) {
+      setPlayed(state.played);
+      playedMotionValue.set(state.played);
+    }
+  };
+
+  const handleMuted = () => {
+    if(!muted) {
+      setMuted(true);
+      setVolume(0);
+      volumeMotionValue.set(0)
+    } else {
+      setMuted(false);
+      setVolume(1);
+      volumeMotionValue.set(1)
+    }
+  };
+
+  const handleVolumeChange = (event) => {
+    setMuted(false);
+    setVolume(event.target.value);
+    volumeMotionValue.set(event.target.value)
+  };
+
+  const handleSeekMouseDown = () => {
+    setSeeking(true);
+  };
+
+  const handleSeekChange = (e) => {
+    const newValue = parseFloat(e.target.value);
+    setPlayed(newValue);
+    playedMotionValue.set(newValue);
+  };
+
+  const handleSeekMouseUp = (e) => {
+    setSeeking(false);
+    playerRef.current.seekTo(parseFloat(e.target.value));
+  };
 
   return (
     <>
       <main className="home">
-        <FullWidthBg
-          classSection="home-section"
-          type="video"
-          url="https://images.beta.cosmos.so/4820ce0b-773c-4953-8e4b-d54c9db9718a.mp4"
-        >
-          <h1 className="super-text home__title">RTRTS</h1>
-        </FullWidthBg>
-        <FullWidthBg
-          classSection="home-section home-section-1 "
-          url="https://images.beta.cosmos.so/21b09005-9166-4ac3-ba31-9436a28d0794.?format=jpeg"
-        >
-
-        </FullWidthBg>
-        <FullWidthBg
-          classSection="home-section section-2 "
-          url="https://images.beta.cosmos.so/833c7ce8-0376-454f-9610-09f3ec21f24a?format=jpeg"
-        >
-          <div className="home__content">
-            <h1>Matthias Leidinger</h1>
-            Originally hailing from Austria, Berlin-based photographer Matthias
-            Leindinger is a young creative brimming with talent and ideas. This
-            is a story on the border between reality and imaginary, about the
-            contradictory feelings that the insularity of a rocky, arid, and
-            wild territory provokes”—so French photographer Clément Chapillon
-            describes his latest highly captivating project Les rochers fauves
-            (French for ‘The tawny rocks’). Though he views photography as a
-            medium for storytelling, Zissou’s images don’t insist on a
-            narrative. Both crisp and ethereal, they’re encoded with an
-            ambiguity—a certain tension—that lets the viewer find their own
-            story within them.
+        <div className="video-wrapper">
+          <ReactPlayer
+            ref={playerRef}
+            // url="https://vimeo.com/911568333"
+            url="/media/KendrickLamar-CountMeOut.webm"
+            className="video"
+            playing={isPlaying}
+            volume={volume}
+            muted={muted}
+            onEnded={() => setIsPlaying(false)}
+            playsinline={true}
+            onDuration={handleDuration}
+            progressInterval={100}
+            onProgress={handleProgress}
+            
+          />
+          <div
+            className={classNames("video__play-btn-wrapper", {
+              "video__play-btn-wrapper--playing": isPlaying,
+            })}
+            onClick={() => setIsPlaying(!isPlaying)}
+          >
+            {!isPlaying ? (
+              <svg
+                viewBox="0 0 26 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="video__play-btn"
+              >
+                <path
+                  d="M26 16L-1.37333e-06 32L0 -1.15754e-06L26 16Z"
+                  fill="white"
+                />
+              </svg>
+            ) : (
+              <svg
+                viewBox="0 0 571 894"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="video__play-btn"
+              >
+                <rect width="237" height="894" fill="white" />
+                <rect x="334" width="237" height="894" fill="white" />
+              </svg>
+            )}
           </div>
-        </FullWidthBg>
-        <FullWidthBg
-          classSection="home-section section-3"
-          id="clement"
-          type="video"
-          url="https://images.beta.cosmos.so/7d13e75d-c0f3-4db4-856a-253498684a81.mp4"
-        >
-          <div className="home__content">
-            <h1>Clément Chapillon</h1>
-            Though he views photography as a medium for storytelling, Zissou’s
-            images don’t insist on a narrative. Both crisp and ethereal, they’re
-            encoded with an ambiguity—a certain tension—that lets the viewer
-            find their own story within them.
+          <div className="video-controll">
+            <div className="video-thumb">
+              <motion.span
+                className="video__thumb-progress"
+                style={{ clipPath: clipPathDuration }}
+              />
+              <input
+                type="range"
+                min={0}
+                max={0.999999}
+                step="any"
+                value={played}
+                onMouseDown={handleSeekMouseDown}
+                onChange={handleSeekChange}
+                onMouseUp={handleSeekMouseUp}
+                className="video__thumb-progress--seek"
+              />
+            </div>
+            <div className="video-volume">
+              <div className="volume-thumb">
+                <div className="volume-thumb__progress-wrapper">
+                  <motion.span 
+                    className="volume-thumb__progress"
+                    style={{ clipPath: clipPathVolume }}
+                  />
+                  <span className="volume-thumb__progress--bg" />
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step="any"
+                  value={volume}
+                  onChange={(event) => handleVolumeChange(event)}
+                  className="video-volume__seek"
+                />
+              </div>
+              <div className="button" onClick={() => handleMuted()}>
+                {!muted && volume > 0 ? (
+                  <>
+                    {volume > 0.5 ? (
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 8.99998V15H7L12 20V3.99998L7 8.99998H3ZM16.5 12C16.4998 11.1621 16.2657 10.3409 15.824 9.62892C15.3823 8.91692 14.7506 8.34237 14 7.96998V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.22998V5.28998C16.89 6.14998 19 8.82998 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.71998 18.01 4.13998 14 3.22998Z"
+                          fill="white"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.4998 11.1621 16.2657 10.3409 15.824 9.62894C15.3823 8.91694 14.7506 8.34239 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12Z"
+                          fill="white"
+                        />
+                      </svg>
+                    )}
+                  </>
+                ) : (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="white" />
+                  </svg>
+                )}
+              </div>
+            </div>
+              <div className="video-volume-colu">
+                <div className="volume-thumb">
+                  <div className="volume-thumb__progress-wrapper">
+                    <motion.span 
+                      className="volume-thumb__progress"
+                      style={{ clipPath: clipPathVolume }}
+                    />
+                    <span className="volume-thumb__progress--bg" />
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step="any"
+                    value={volume}
+                    onChange={(event) => handleVolumeChange(event)}
+                    className="video-volume__seek"
+                  />
+                </div>
+                <div className="button" onClick={() => handleMuted()}>
+                  {!muted && volume > 0 ? (
+                    <>
+                      {volume > 0.5 ? (
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 8.99998V15H7L12 20V3.99998L7 8.99998H3ZM16.5 12C16.4998 11.1621 16.2657 10.3409 15.824 9.62892C15.3823 8.91692 14.7506 8.34237 14 7.96998V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.22998V5.28998C16.89 6.14998 19 8.82998 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.71998 18.01 4.13998 14 3.22998Z"
+                            fill="white"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.4998 11.1621 16.2657 10.3409 15.824 9.62894C15.3823 8.91694 14.7506 8.34239 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12Z"
+                            fill="white"
+                          />
+                        </svg>
+                      )}
+                    </>
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="white" />
+                    </svg>
+                  )}
+                </div>
+              </div>
           </div>
-        </FullWidthBg>
+        </div>
       </main>
-
-      <Transition isPresent={isPresent} />
     </>
   );
 }

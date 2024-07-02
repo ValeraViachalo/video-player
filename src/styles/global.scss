@@ -6,6 +6,7 @@
 body {
   @extend %body-text;
   color: $c-black;
+  background-color: $c-white-50;
   overflow-x: hidden;
   opacity: 1;
 }

@@ -1,32 +1,224 @@
-.home{
-  &-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+@import "/src/styles/global.scss";
 
-    &-1 {
-      height: 200vh;
+.home {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .video {
+    width: 100% !important;
+    height: 100% !important;
+
+    &-wrapper {
+      aspect-ratio: 16/9;
+      width: 70vw;
+      position: relative;
     }
-  }
-  
-  &__content{
-    border: 1px solid;
-    width: 70%;
-    margin: 0 auto;
-    padding: 10vw;
-    text-align: center;
-  }
 
-  &__title {
-    color: rgb(255, 255, 255);
-    mix-blend-mode: difference;
-    font-weight: normal;
-  }
-}
+    &__play-btn {
+      width: 100%;
+      height: 100%;
+      display: block;
+      width: VW(140);
+      height: VW(40);
+      padding: VW(22) 0;
+      margin: 15vw 20vw;
+      background-color: red;
 
-#clement {
-  .home__content {
-    mix-blend-mode: difference;
-    color: wheat;
+      &-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        transition: 0.4s ease;
+        transition-property: filter opacity;
+
+        &--playing {
+          opacity: 0;
+        }
+
+        @include hover {
+          filter: brightness(0.6);
+          opacity: 0.8;
+        }
+      }
+    }
+
+    &-controll {
+      position: absolute;
+      bottom: 0.1%;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    &-thumb {
+      position: relative;
+      margin-left: .1%;
+      width: 80%;
+      height: 0.3vw;
+      background-color: #4242427a;
+      transition: height 0.3s ease;
+
+      @include hover {
+        height: 0.7vw;
+      }
+    }
+
+    &__thumb-progress {
+      display: block;
+      position: relative;
+      z-index: 10;
+      background-color: red;
+      height: 100%;
+      width: 100%;
+      transition: 0.3s ease;
+      transition-property: height, clipPath;
+      user-select: none;
+
+      &--seek {
+        position: absolute;
+        bottom: 0;
+        height: 0.7vw;
+        width: 100%;
+        z-index: 11;
+        opacity: 0;
+      }
+    }
+
+    &-volume {
+      margin-left: VW(50);
+      display: flex;
+      align-items: center;
+      flex-direction: row-reverse;
+      gap: VW(10);
+      height: VW(28);
+      margin-bottom: 0.1%;
+
+      @include hover {
+        .volume-thumb {
+          opacity: 1;
+        }
+
+        .button {
+          opacity: 1;
+        }
+      }
+      
+      &__seek {
+        opacity: 0;
+        position: absolute;
+        top: -15%;
+        width: 100%;
+      }
+      .volume-thumb {
+        opacity: 0;
+        width: 6vw;
+        height: .6vw;
+        position: relative;
+        transition: opacity .3s ease;
+
+        &__progress {
+          &-wrapper {
+            position: relative;
+            width: 6vw;
+            height: .6vw;
+          }
+
+          position: absolute;
+          top: 0%;
+          display: block;
+          width: 100%;
+          height: 100%;
+          background-color: red;
+          
+          &--bg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #4242427a;
+          }
+        }
+      }
+
+      .button {
+        width: VW(25);
+        height: VW(25);
+        opacity: 0.4;
+        display: flex;
+      }
+    }
+
+    &-volume-column {
+      margin-left: VW(50);
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: VW(10);
+      height: max-content;
+      margin-bottom: 0.1%;
+
+      @include hover {
+        .volume-thumb {
+          opacity: 1;
+        }
+
+        .button {
+          opacity: 1;
+        }
+      }
+      
+      &__seek {
+        opacity: 0;
+        position: absolute;
+        top: -15%;
+        width: 100%;
+      }
+      .volume-thumb {
+        opacity: 0;
+        width: 6vw;
+        height: .6vw;
+        position: relative;
+        transition: opacity .3s ease;
+        transform: translateX(45%);
+
+        rotate: -90deg;
+
+        &__progress {
+          &-wrapper {
+            position: relative;
+            width: 6vw;
+            height: .6vw;
+          }
+
+          position: absolute;
+          bottom: 0%;
+          display: block;
+          width: 100%;
+          height: 100%;
+          background-color: red;
+          
+          &--bg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #4242427a;
+          }
+        }
+      }
+
+      .button {
+        width: VW(25);
+        height: VW(25);
+        opacity: 0.4;
+        display: flex;
+      }
+    }
   }
 }
